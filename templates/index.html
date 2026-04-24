@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>AgroVision</title>
+</head>
+<body>
+    <h1>AgroVision rodando 🚀</h1>
+
+    <!-- IMAGEM DA CÂMERA -->
+    <img src="/frame" width="600"/>
+
+    <h2>Eventos</h2>
+    <pre id="events"></pre>
+
+    <script>
+        async function carregarEventos() {
+            let res = await fetch('/events');
+            let data = await res.json();
+            document.getElementById('events').innerText =
+                JSON.stringify(data, null, 2);
+        }
+
+        setInterval(carregarEventos, 2000);
+    </script>
+
+</body>
+</html>

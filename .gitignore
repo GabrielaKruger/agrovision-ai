@@ -1,0 +1,12 @@
+# ambiente
+.venv/
+__pycache__/
+
+# banco
+*.db
+
+# imagens
+static/captures/
+
+# modelo
+*.pt
