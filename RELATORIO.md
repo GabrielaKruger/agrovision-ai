@@ -85,5 +85,11 @@ Melhora o projeto ao fornecer contexto ambiental e econômico para detecções, 
    - senha: `password`
 
 ## Link do Git
-[GitHub Repository](https://github.com/user/agrovision_ia)  # Substitua pelo link real</content>
-<parameter name="filePath">c:\Users\GABI\Documents\agrovision_ia\RELATORIO.md
+[GitHub Repository](https://github.com/GabrielaKruger/agrovision-ai.git) 
+
+
+
+
+
+
+
