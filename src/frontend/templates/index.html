@@ -1,0 +1,91 @@
+<html>
+<head>
+    <title>AgroVision</title>
+</head>
+<body>
+    <h1>AgroVision rodando 🚀</h1>
+
+    <!-- IMAGEM DA CÂMERA -->
+    <img id="camera" src="/frame" width="600" alt="Camera feed" />
+
+    <h2>Eventos</h2>
+    <pre id="events"></pre>
+
+    <h2>Previsão do Tempo</h2>
+    <pre id="weather"></pre>
+
+    <h2>Notícias Agrícolas</h2>
+    <pre id="news"></pre>
+
+    <h2>Preços de Commodities</h2>
+    <pre id="commodities"></pre>
+
+    <h2>Capturas Salvas</h2>
+    <div id="captures"></div>
+
+    <script>
+        async function carregarEventos() {
+            let res = await fetch('/events');
+            let data = await res.json();
+            document.getElementById('events').innerText =
+                JSON.stringify(data, null, 2);
+        }
+
+        async function carregarWeather() {
+            let res = await fetch('/weather');
+            let data = await res.json();
+            document.getElementById('weather').innerText =
+                JSON.stringify(data, null, 2);
+        }
+
+        async function carregarNews() {
+            let res = await fetch('/news');
+            let data = await res.json();
+            document.getElementById('news').innerText =
+                JSON.stringify(data, null, 2);
+        }
+
+        async function carregarCommodities() {
+            let res = await fetch('/commodities');
+            let data = await res.json();
+            document.getElementById('commodities').innerText =
+                JSON.stringify(data, null, 2);
+        }
+
+        async function carregarCaptures() {
+            let res = await fetch('/captures');
+            let data = await res.json();
+            const capturesDiv = document.getElementById('captures');
+            capturesDiv.innerHTML = '';
+            data.captures.forEach(file => {
+                const img = document.createElement('img');
+                img.src = `/static/captures/${file}`;
+                img.width = 200;
+                img.alt = file;
+                capturesDiv.appendChild(img);
+            });
+        }
+
+        async function carregarFrame() {
+            const camera = document.getElementById('camera');
+            camera.src = '/frame?cache=' + Date.now();
+        }
+
+        setInterval(carregarEventos, 2000);
+        setInterval(carregarWeather, 60000); // every minute
+        setInterval(carregarNews, 300000); // every 5 minutes
+        setInterval(carregarCommodities, 3600000); // every hour
+        setInterval(carregarFrame, 2000); // atualiza o frame da câmera a cada 2 segundos
+        setInterval(carregarCaptures, 10000); // atualiza as capturas a cada 10 segundos
+
+        // Load initially
+        carregarEventos();
+        carregarWeather();
+        carregarNews();
+        carregarCommodities();
+        carregarFrame();
+        carregarCaptures();
+    </script>
+
+</body>
+</html>

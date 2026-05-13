@@ -1,12 +1,60 @@
 # ambiente
 .venv/
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# variáveis de ambiente
+.env
+.env.local
+.env.production
 
 # banco
 *.db
+*.sqlite
+*.sqlite3
 
-# imagens
+# imagens capturadas
 static/captures/
 
 # modelo
 *.pt
+*.onnx
+
+# logs ou outros
+*.log
+*.tmp
+*.temp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# outros
+node_modules/
+*.zip
+*.tar.gz
