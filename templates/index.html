@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroVision AI</title>
+    <style>
+ /* ===== RESET ===== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg,#fff0f8,#fdf4ff,#ffe8f3);
+    min-height:100vh;
+    padding:30px;
+    color:#6b4f5f;
+}
+
+/* ===== CONTAINER ===== */
+.container{
+    max-width:1400px;
+    margin:auto;
+}
+
+/* ===== HEADER ===== */
+header{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+header h1{
+    font-size:42px;
+    color:#d63384;
+    margin-bottom:10px;
+    font-weight:700;
+}
+
+header p{
+    color:#8f6680;
+    font-size:16px;
+}
+
+/* ===== GRID ===== */
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+}
+
+/* ===== CARDS ===== */
+.card{
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(12px);
+    border-radius:25px;
+    padding:25px;
+    border:1px solid rgba(255,255,255,0.6);
+    box-shadow:0 8px 30px rgba(214,51,132,0.12);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-4px);
+}
+
+.card h2{
+    color:#d63384;
+    margin-bottom:15px;
+    font-size:20px;
+}
+
+/* ===== CAMERA ===== */
+.frame-img{
+    width:100%;
+    border-radius:20px;
+    border:3px solid #ffd6eb;
+    display:block;
+}
+
+/* ===== TABELA ===== */
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#ffe4f1;
+    color:#c2185b;
+    padding:14px;
+    font-size:14px;
+}
+
+td{
+    padding:14px;
+    border-bottom:1px solid #f8d9ea;
+    font-size:14px;
+}
+
+tr:hover{
+    background:#fff7fb;
+}
+
+/* ===== BADGE ===== */
+.badge{
+    background:linear-gradient(135deg,#ff9ac6,#f06292);
+    color:white;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    display:inline-block;
+}
+
+/* ===== LINKS ===== */
+a{
+    color:#d63384;
+    text-decoration:none;
+    font-weight:600;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
+/* ===== CHAT ===== */
+.chat-box{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.chat-box textarea{
+    width:100%;
+    min-height:120px;
+    resize:vertical;
+    border:2px solid #ffd6eb;
+    border-radius:16px;
+    padding:15px;
+    font-size:14px;
+    background:#fff;
+    color:#6b4f5f;
+}
+
+.chat-box textarea:focus{
+    outline:none;
+    border-color:#d63384;
+    box-shadow:0 0 15px rgba(214,51,132,.15);
+}
+
+.chat-box button{
+    width:220px;
+    background:linear-gradient(135deg,#ff85c1,#d63384);
+    color:white;
+    border:none;
+    border-radius:15px;
+    padding:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.chat-box button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px rgba(214,51,132,.25);
+}
+
+.chat-box button:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.chat-status{
+    color:#8f6680;
+    font-size:13px;
+}
+
+.chat-response{
+    background:#fff;
+    border:2px solid #ffe4f1;
+    border-radius:16px;
+    padding:16px;
+    min-height:80px;
+    white-space:pre-wrap;
+    line-height:1.6;
+}
+
+/* ===== SCROLL ===== */
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#ffb6d9;
+    border-radius:10px;
+}
+
+/* ===== RESPONSIVO ===== */
+@media(max-width:900px){
+
+    body{
+        padding:15px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    header h1{
+        font-size:30px;
+    }
+
+    .chat-box button{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Cabeçalho -->
+        <header>
+            <h1>🌾 AgroVision AI</h1>
+            <p>Monitoramento rural com detecção inteligente de pessoas e veículos.</p>
+        </header>
+
+        <!-- Grade principal: câmera + eventos -->
+        <div class="grid">
+
+            <!-- Card: Frame da câmera -->
+            <div class="card">
+                <h2>📷 Último frame</h2>
+                <img id="camera-frame" class="frame-img" src="/frame" alt="Último frame da câmera">
+            </div>
+
+            <!-- Card: Eventos recentes -->
+            <div class="card">
+                <h2>🔔 Eventos recentes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Tipo</th>
+                            <th>Confiança</th>
+                            <th>Evidência</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-body">
+                        {% for event in events %}
+                        <tr>
+                            <td>{{ event.event_time }}</td>
+                            <td><span class="badge">{{ event.label }}</span></td>
+                            <td>{{ "%.2f"|format(event.confidence) }}</td>
+                            <td><a href="{{ event.image_path }}" target="_blank">Abrir</a></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align:center; color:#ffffff; padding:20px;">
+                                Nenhum evento registrado ainda.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- Card: Chat de interpretação -->
+        <div class="card" style="margin-top: 20px;">
+            <h2>💬 Chat de interpretação de eventos</h2>
+            <p style="color:#f9f5f5; font-size:14px; margin-bottom:12px;">
+                Faça perguntas sobre os eventos detectados pelo sistema.
+            </p>
+
+            <div class="chat-box">
+                <textarea id="chat-question" placeholder="Exemplo: o que foi detectado no último evento?"></textarea>
+
+                <button id="chat-btn" onclick="sendQuestion()">Enviar pergunta</button>
+
+                <div class="chat-status" id="chat-status"></div>
+
+                <div class="chat-response" id="chat-response">
+                    A resposta do sistema aparecerá aqui.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ===== ATUALIZAÇÃO AUTOMÁTICA DO FRAME =====
+        function refreshFrame() {
+            const img = document.getElementById("camera-frame");
+            // Adiciona timestamp para evitar cache
+            img.src = "/frame?" + Date.now();
+        }
+
+        // Atualiza o frame a cada 2 segundos
+        setInterval(refreshFrame, 2000);
+
+        // ===== ATUALIZAÇÃO AUTOMÁTICA DOS EVENTOS =====
+        function formatConfidence(value) {
+            const confidence = Number(value);
+            if (Number.isNaN(confidence)) {
+                return "-";
+            }
+            return confidence.toFixed(2);
+        }
+
+        function renderEvents(events) {
+            const tbody = document.getElementById("events-body");
+            if (!tbody) {
+                return;
+            }
+
+            if (!Array.isArray(events) || events.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align:center; color:#ffffff; padding:20px;">
+                            Nenhum evento registrado ainda.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const rows = events.slice(0, 20).map((event) => {
+                const evidencePath = event.image_path || "#";
+                return `
+                    <tr>
+                        <td>${event.event_time || "-"}</td>
+                        <td><span class="badge">${event.label || "-"}</span></td>
+                        <td>${formatConfidence(event.confidence)}</td>
+                        <td><a href="${evidencePath}" target="_blank">Abrir</a></td>
+                    </tr>
+                `;
+            }).join("");
+
+            tbody.innerHTML = rows;
+        }
+
+        async function refreshEvents() {
+            try {
+                const response = await fetch("/events", { cache: "no-store" });
+                if (!response.ok) {
+                    return;
+                }
+                const data = await response.json();
+                renderEvents(data);
+            } catch (error) {
+                console.error("Erro ao atualizar eventos:", error);
+            }
+        }
+
+        // Atualiza eventos a cada 3 segundos
+        setInterval(refreshEvents, 3000);
+        refreshEvents();
+
+        // ===== CHAT =====
+        async function sendQuestion() {
+            const questionField = document.getElementById("chat-question");
+            const responseBox = document.getElementById("chat-response");
+            const statusBox = document.getElementById("chat-status");
+            const btn = document.getElementById("chat-btn");
+
+            const message = questionField.value.trim();
+
+            if (!message) {
+                responseBox.innerText = "⚠️ Digite uma pergunta antes de enviar.";
+                return;
+            }
+
+            // Desabilita botão durante requisição
+            btn.disabled = true;
+            statusBox.innerText = "⏳ Consultando o último evento...";
+            responseBox.innerText = "Processando...";
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: message }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                responseBox.innerText = data.answer || "Nenhuma resposta retornada.";
+                statusBox.innerText = "✅ Resposta gerada com sucesso.";
+
+            } catch (error) {
+                responseBox.innerText = "❌ Não foi possível obter resposta do chat.";
+                statusBox.innerText = "Erro ao consultar o serviço.";
+                console.error(error);
+
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Permite enviar com Ctrl+Enter
+        document.getElementById("chat-question").addEventListener("keydown", function (e) {
+            if (e.ctrlKey && e.key === "Enter") {
+                sendQuestion();
+            }
+        });
+    </script>
+</body>
+
+</html>

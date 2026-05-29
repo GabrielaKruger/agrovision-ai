@@ -4,12 +4,17 @@
 
 ## Integrantes
 
+<<<<<<< Updated upstream
 * Gabriela Krüger
+=======
+- Gabriela
+>>>>>>> Stashed changes
 
 ---
 
 # 1. Introdução
 
+<<<<<<< Updated upstream
 O AgroVision AI é um sistema de monitoramento inteligente voltado ao ambiente rural, desenvolvido com o objetivo de detectar pessoas, veículos e movimentações utilizando Visão Computacional através do modelo YOLO11.
 
 O sistema utiliza FastAPI para disponibilização da API, SQLite para persistência dos eventos detectados, YOLO11 para detecção de objetos, Ollama para interpretação contextual dos eventos e uma camada de Web Scraping para enriquecimento das informações apresentadas ao usuário.
@@ -460,6 +465,370 @@ services/config.py
 ### Benefício
 
 Centralização das configurações do sistema.
+=======
+O projeto **AgroVision AI** foi desenvolvido com o objetivo de realizar monitoramento rural inteligente utilizando Visão Computacional através do modelo YOLO11, permitindo identificar pessoas, veículos e outros elementos em imagens ou vídeos em tempo real.
+
+Além da detecção, o sistema disponibiliza uma interface web para acompanhamento dos eventos registrados, armazenamento das evidências em banco de dados e integração com um agente de Inteligência Artificial local utilizando Ollama.
+
+Este relatório apresenta uma análise da arquitetura do sistema, aspectos de segurança, melhorias aplicadas ao código gerado por IA e implementação de uma camada de Web Scraping para enriquecimento das informações apresentadas ao usuário.
+
+---
+
+# 2. Parte 1 — Revisão da Arquitetura
+
+## Estrutura Atual
+
+```text
+agrovision_ia/
+├── app.py
+├── templates/
+├── static/
+├── services/
+├── detections.db
+├── uploads/
+├── runs/
+├── dataset_agro/
+└── models/
+```
+
+## Frontend
+
+### Componentes
+
+```text
+templates/index.html
+static/
+```
+
+### Responsabilidades
+
+- Exibir vídeo monitorado
+- Exibir eventos detectados
+- Exibir respostas da IA
+- Atualizar dados em tempo real
+
+### Análise
+
+A interface atua apenas como camada de apresentação dos dados.
+
+Não foram identificadas regras de negócio implementadas diretamente no frontend.
+
+**Conclusão:** O frontend está corretamente separado da lógica principal.
+
+---
+
+## Backend / API
+
+### Arquivo Principal
+
+```text
+app.py
+```
+
+### Responsabilidades
+
+- Gerenciamento das rotas
+- Comunicação com os serviços
+- Processamento das requisições
+- Integração com IA
+- Controle dos eventos
+
+### Análise
+
+Toda a lógica principal encontra-se concentrada no backend.
+
+**Conclusão:** Estrutura adequada.
+
+---
+
+## Banco de Dados
+
+### Tecnologia Utilizada
+
+```text
+SQLite
+```
+
+### Arquivo
+
+```text
+detections.db
+```
+
+### Informações Armazenadas
+
+- Tipo da detecção
+- Data e horário
+- Confiança da detecção
+- Evidência capturada
+
+### Análise
+
+O banco encontra-se separado da camada de apresentação.
+
+**Conclusão:** Estrutura adequada para um protótipo acadêmico.
+
+---
+
+## Serviços Internos
+
+### Localização
+
+```text
+services/
+```
+
+### Responsabilidades
+
+- Comunicação com Ollama
+- Configurações do sistema
+- Monitoramento por vídeo
+- Persistência dos eventos
+- Web Scraping
+
+### Análise
+
+Os serviços estão desacoplados da interface e da API.
+
+**Conclusão:** Boa organização arquitetural.
+
+---
+
+## Camada de IA
+
+### Tecnologias
+
+```text
+YOLO11
+Ollama
+```
+
+### Responsabilidades
+
+- Detecção de objetos
+- Interpretação dos eventos
+
+### Análise
+
+A camada de IA está separada da regra de negócio.
+
+**Conclusão:** Arquitetura adequada.
+
+---
+
+## Camada de Integração Externa
+
+### URL utilizada
+
+```text
+http://127.0.0.1:11434/api/chat
+```
+
+### Análise
+
+A integração está isolada em um serviço próprio.
+
+**Conclusão:** Boa prática arquitetural.
+
+---
+
+## Camada de Web Scraping
+
+### Arquivo
+
+```text
+services/scraping_service.py
+```
+
+### Responsabilidades
+
+- Buscar informações externas
+- Organizar dados coletados
+- Disponibilizar informações ao sistema
+
+### Análise
+
+O scraping encontra-se desacoplado das rotas e da interface.
+
+**Conclusão:** Estrutura adequada.
+
+---
+
+## Conclusão da Arquitetura
+
+| Item | Status |
+|--------|--------|
+| Frontend separado 
+| Backend separado 
+| Banco separado 
+| IA separada 
+| Integrações externas separadas 
+| Web Scraping separado 
+
+---
+
+# 3. Parte 2 — Revisão de Segurança
+
+## Credenciais e Configurações
+
+O projeto utiliza variáveis de ambiente.
+
+### Exemplo
+
+```python
+OLLAMA_URL
+OLLAMA_MODEL
+CAMERA_SOURCE
+MODEL_PATH
+```
+
+### Risco
+
+Caso o arquivo `.env` seja enviado ao GitHub, informações sensíveis poderão ser expostas.
+
+### Melhoria
+
+Adicionar o arquivo ao `.gitignore`.
+
+---
+
+## Validação das Entradas
+
+### Endpoint
+
+```http
+POST /chat
+```
+
+### Problema
+
+As mensagens enviadas pelo usuário não possuem validação robusta.
+
+### Riscos
+
+- Texto excessivamente grande
+- Entradas inesperadas
+
+### Melhoria
+
+Implementar:
+
+```python
+if len(message) > 500:
+    return "Mensagem muito longa"
+```
+
+---
+
+## SQL Injection
+
+### Problema
+
+Caso consultas sejam montadas usando concatenação.
+
+### Exemplo Incorreto
+
+```python
+query = "SELECT * FROM events WHERE id=" + id
+```
+
+### Exemplo Correto
+
+```python
+cursor.execute(
+    "SELECT * FROM events WHERE id=?",
+    (id,)
+)
+```
+
+### Conclusão
+
+O projeto deve utilizar apenas consultas parametrizadas.
+
+---
+
+## Exposição de Erros
+
+### Problema
+
+Algumas mensagens técnicas podem ser exibidas ao usuário.
+
+### Exemplo
+
+```python
+return f"Erro inesperado conectando ao agente: {e}"
+```
+
+### Melhoria
+
+Registrar erros apenas em logs.
+
+```python
+print(e)
+
+return "Serviço temporariamente indisponível."
+```
+
+---
+
+## Upload de Arquivos
+
+### Riscos
+
+- Arquivos maliciosos
+- Arquivos excessivamente grandes
+
+### Melhorias
+
+- Validar extensão
+- Validar tamanho
+- Sanitizar nomes
+
+### Exemplo
+
+```python
+if file.size > MAX_SIZE:
+    raise Exception("Arquivo muito grande")
+```
+
+---
+
+## Conclusão da Segurança
+
+| Item | Situação |
+|--------|--------|
+| Uso de variáveis de ambiente 
+| Validação de entrada
+| SQL Injection
+| Tratamento de erros 
+| Segurança de upload 
+
+---
+
+# 4. Parte 3 — Melhorias no Código Gerado por IA
+
+## Melhoria 1 — Configurações Centralizadas
+
+### Código Original
+
+As configurações estavam distribuídas pelo sistema.
+
+### Problema
+
+Dificuldade de manutenção.
+
+### Solução
+
+Criação do arquivo:
+
+```text
+services/config.py
+```
+
+### Benefício
+
+Centralização das configurações.
+>>>>>>> Stashed changes
 
 ---
 
@@ -467,22 +836,40 @@ Centralização das configurações do sistema.
 
 ### Código Original
 
+<<<<<<< Updated upstream
 Não existia tratamento adequado para falhas de conexão.
 
 ### Problema
 
 O sistema poderia interromper sua execução caso o Ollama estivesse indisponível.
+=======
+Não existia tratamento de erro.
+
+### Problema
+
+O sistema falhava quando o Ollama estava offline.
+>>>>>>> Stashed changes
 
 ### Solução
 
 ```python
+<<<<<<< Updated upstream
+=======
+try:
+    with urllib.request.urlopen(req) as response:
+        ...
+>>>>>>> Stashed changes
 except urllib.error.URLError:
     return "Desculpe, meu cérebro local parece estar offline."
 ```
 
 ### Benefício
 
+<<<<<<< Updated upstream
 Maior robustez e estabilidade.
+=======
+Maior estabilidade.
+>>>>>>> Stashed changes
 
 ---
 
@@ -490,6 +877,7 @@ Maior robustez e estabilidade.
 
 ### Código Original
 
+<<<<<<< Updated upstream
 Grande parte da lógica concentrada em poucos arquivos.
 
 ### Problema
@@ -499,6 +887,17 @@ Alto acoplamento e baixa escalabilidade.
 ### Solução
 
 Criação da estrutura:
+=======
+Toda a lógica estava concentrada em poucos arquivos.
+
+### Problema
+
+Alto acoplamento.
+
+### Solução
+
+Criação da pasta:
+>>>>>>> Stashed changes
 
 ```text
 services/
@@ -506,6 +905,7 @@ services/
 
 ### Benefício
 
+<<<<<<< Updated upstream
 Maior organização e manutenção.
 
 ---
@@ -556,6 +956,9 @@ services/ollama_client.py
 ### Benefício
 
 Maior modularidade.
+=======
+Melhor manutenção e escalabilidade.
+>>>>>>> Stashed changes
 
 ---
 
@@ -563,12 +966,17 @@ Maior modularidade.
 
 ## Objetivo
 
+<<<<<<< Updated upstream
 Complementar os eventos detectados com informações externas relevantes ao ambiente rural.
+=======
+Enriquecer o sistema com informações externas relevantes ao ambiente rural.
+>>>>>>> Stashed changes
 
 ---
 
 ## Dados Coletados
 
+<<<<<<< Updated upstream
 O sistema realiza coleta de:
 
 * Previsão do tempo
@@ -577,11 +985,21 @@ O sistema realiza coleta de:
 * Alertas climáticos
 * Notícias do agronegócio
 * Informações públicas do setor agrícola
+=======
+O sistema realizará coleta de:
+
+- Previsão do tempo
+- Temperatura
+- Umidade
+- Alertas climáticos
+- Notícias do agronegócio
+>>>>>>> Stashed changes
 
 ---
 
 ## Justificativa
 
+<<<<<<< Updated upstream
 As condições climáticas possuem influência direta sobre:
 
 * Segurança da propriedade
@@ -594,6 +1012,20 @@ Os dados coletados complementam as informações obtidas pelo YOLO e auxiliam na
 ---
 
 ## Serviço Implementado
+=======
+As informações climáticas influenciam diretamente:
+
+- Segurança da propriedade
+- Operações agrícolas
+- Movimentação de máquinas
+- Atividades de campo
+
+Esses dados ajudam a contextualizar os eventos detectados pelo YOLO.
+
+---
+
+## Implementação
+>>>>>>> Stashed changes
 
 ### Arquivo
 
@@ -601,11 +1033,23 @@ Os dados coletados complementam as informações obtidas pelo YOLO e auxiliam na
 services/scraping_service.py
 ```
 
+<<<<<<< Updated upstream
 ### Responsabilidades
 
 * Buscar dados externos
 * Organizar dados em JSON
 * Disponibilizar informações ao sistema
+=======
+### Exemplo
+
+```python
+import requests
+
+def obter_clima():
+    response = requests.get(URL)
+    return response.json()
+```
+>>>>>>> Stashed changes
 
 ---
 
@@ -613,15 +1057,23 @@ services/scraping_service.py
 
 ```python
 try:
+<<<<<<< Updated upstream
     ...
 except Exception:
     return {
         "status": "indisponivel"
+=======
+    dados = requests.get(URL)
+except:
+    return {
+        "erro": "Serviço indisponível"
+>>>>>>> Stashed changes
     }
 ```
 
 ---
 
+<<<<<<< Updated upstream
 ## Controle de Requisições
 
 Foi implementado mecanismo de cache e limite de consultas.
@@ -631,6 +1083,17 @@ Foi implementado mecanismo de cache e limite de consultas.
 * Evitar excesso de requisições
 * Melhorar desempenho
 * Reduzir consumo de recursos
+=======
+## Limite de Requisições
+
+Para evitar sobrecarga da fonte de dados:
+
+```python
+CACHE_TIME = 300
+```
+
+Atualização a cada 5 minutos.
+>>>>>>> Stashed changes
 
 ---
 
@@ -639,10 +1102,16 @@ Foi implementado mecanismo de cache e limite de consultas.
 ```json
 {
   "cidade": "Toledo",
+<<<<<<< Updated upstream
   "temperatura": 24,
   "umidade": 68,
   "clima": "Ensolarado",
   "alerta": "Nenhum alerta ativo"
+=======
+  "temperatura": 25,
+  "umidade": 72,
+  "clima": "Ensolarado"
+>>>>>>> Stashed changes
 }
 ```
 
@@ -650,19 +1119,35 @@ Foi implementado mecanismo de cache e limite de consultas.
 
 ## Integração ao Sistema
 
+<<<<<<< Updated upstream
 Os dados coletados são utilizados:
 
 * No dashboard principal
 * Nas respostas do Ollama
 * No contexto dos eventos detectados
 * Nas análises realizadas pelo sistema
+=======
+Os dados coletados serão utilizados:
+
+- No dashboard principal
+- Nas análises da IA
+- No contexto dos eventos detectados
+>>>>>>> Stashed changes
 
 ---
 
 # Conclusão
 
+<<<<<<< Updated upstream
 O AgroVision AI apresenta uma arquitetura organizada, com separação clara entre frontend, backend, banco de dados, serviços internos, inteligência artificial, visão computacional e integração externa.
 
 A revisão identificou melhorias aplicadas ao código originalmente gerado por IA, resultando em maior organização, segurança, manutenção e escalabilidade.
 
 A implementação da camada de Web Scraping agrega informações contextuais relevantes ao ambiente rural monitorado, tornando o sistema mais completo e útil para apoio à tomada de decisão.
+=======
+O projeto AgroVision AI apresenta uma arquitetura organizada, separando frontend, backend, banco de dados, serviços internos e inteligência artificial.
+
+Foram identificadas oportunidades de melhoria relacionadas à validação de entradas, tratamento de erros e segurança de uploads.
+
+A implementação da camada de Web Scraping agrega valor ao sistema ao fornecer informações contextuais relevantes para o ambiente rural monitorado, tornando as análises mais completas e úteis para os usuários.
+>>>>>>> Stashed changes

@@ -1,0 +1,13 @@
+# Configuração do dataset para treinamento com YOLO
+# Edite as classes conforme o seu projeto
+
+path: dataset_agro       # raiz do dataset (relativo à raiz do projeto)
+train: images/train      # imagens de treino
+val: images/val          # imagens de validação
+
+# Nomes das classes (índice: nome)
+names:
+  0: person
+  1: carro
+  2: motocicleta
+  3: bus
